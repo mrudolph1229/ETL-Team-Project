@@ -8,7 +8,7 @@ from sqlalchemy import create_engine
 import pymysql
 pymysql.install_as_MySQLdb()
 from userpasswd import username, passwd
-from flask import Flask, render_template, redirect
+from flask import Flask, render_template, redirect, jsonify
 from flask_pymongo import PyMongo
 
 # Create an instance of Flask
@@ -53,10 +53,15 @@ def display_data(player_name):
     comb_df = pd.merge(player_data_df, player_info_df, on="name", how="inner")
     #print('DataFrame')
     #print(comb_df)
+    if comb_df.index.empty:
+        return jsonify({"error": f"Unable to find {player_name} try a different name"}), 404
+
     comb_dict = comb_df.to_dict('records')
     #print('List of Dictionary')
     #print(comb_dict)
+
     return render_template("player-page.html", player_data=comb_dict)
+    
 
 if __name__ == "__main__":
     app.run(debug=True)
